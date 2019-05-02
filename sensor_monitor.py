@@ -333,5 +333,5 @@ if __name__ == "__main__" :
 	while True :
 		readings = monitor.get_readings ( )
 		line = monitor.save_readings ( datetime.datetime.now ( ), readings )
-		print ( line )
+#		print ( line )
 		time.sleep ( args.interval )
