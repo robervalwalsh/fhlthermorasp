@@ -48,11 +48,11 @@ Still under development
 
 # System Services
 
-Automatically start sensor_monitor.py and server.py at boot or when the processes crash
+Automatically start `sensor_monitor.py` and `server.py` at boot or when the processes crash
 
-The files sensor_monitor.service and sensor_server.service must be copied to /etc/systemd/system
+The files `sensor_monitor.service` and `sensor_server.service` must be copied to `/etc/systemd/system`
  
-Enable the services (will start at the next reboot)
+Enable the services (services start during boot)
 
 - `systemctl enable sensor_monitor`
 - `systemctl enable sensor_server`
