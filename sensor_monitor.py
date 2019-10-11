@@ -13,6 +13,15 @@ from sht75 import SHT75
 from bme680 import myBME680
 from dust import DustSensor
 
+#finish = False
+#def signal_handler(signum, frame):
+#	global finish
+#	finish = True
+##Handle stop process siginal
+#signal.signal(signal.SIGINT, signal_handler)
+
+
+
 class SensorMonitor ( object ) :
 	KNOWN_SENSORS = { "W1Temp": [W1TempSensor], "SHT21": [SHT21], "DHT11": [DHT11], "BME280": [BME280], "SHT75": [SHT75], "BME680": [myBME680], "DUST": [DustSensor] }
 
@@ -269,6 +278,13 @@ if __name__ == "__main__" :
 	import time
 	import sys
 
+	import socket
+	import signal
+
+
+	HOST = ""
+	PORT = 50007
+
 	parser = ArgumentParser ( description = "Monitor various sensors over time." )
 	parser.add_argument ( "--dir", type = str, help = "A directory to save logs to. Default: Save to CWD." )
 	parser.add_argument ( "--config", "-c", type = str, help = "A JSON config file to read configuration (enabled sensors etc.) from." )
@@ -329,9 +345,19 @@ if __name__ == "__main__" :
 		fp.close ( )
 		sys.exit ( )
 
-	print ( monitor.save_log_fields ( ) )
-	while True :
-		readings = monitor.get_readings ( )
-		line = monitor.save_readings ( datetime.datetime.now ( ), readings )
-#		print ( line )
-		time.sleep ( args.interval )
+	log_fields = "#%s\n" % ( monitor.save_log_fields ( ), )
+	print ( log_fields )
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		s.bind((HOST, PORT))
+		print("Listening on port %i" % PORT)
+		s.listen(10)
+		while True :
+			conn, addr = s.accept()
+			print("Got connection from %s:%i" % addr)
+			readings = monitor.get_readings ( )
+			line = monitor.save_readings ( datetime.datetime.now ( ), readings )
+			data = "%s%s" % (log_fields,line)
+			with conn:
+				conn.sendall(str.encode(data))
+#			time.sleep ( args.interval )
