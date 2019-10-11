@@ -1,0 +1,15 @@
+[Unit]
+Description=Sensor Monitor
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/fhlthermorasp
+#ExecStart=/opt/fhlthermorasp/sensor_monitor.sh
+ExecStart=/usr/bin/nohup /usr/bin/python3 /opt/fhlthermorasp/sensor_monitor.py --dir /opt/measurements --bme680
+# Other Restart options: or always, on-abort, etc
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

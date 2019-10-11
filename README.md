@@ -34,7 +34,7 @@ Other tools/files:
 
 Usage:
 
-- `python3 sensor_monitor.py --<sensors> --dir <directory>` for continuous read-out, results are saved to <directory>
+- `python3 sensor_monitor.py --<sensors> --dir <directory>` for continuous read-out, results are saved to `<directory>`
 - `python3 sensor_monitor_gui.py` contains a GUI
 - `python3 server.py <file>` reports the current measurement status to a TCP client
 
@@ -44,3 +44,24 @@ Usage:
 Still under development
 
 - You can compile `monitor.cc` for a continuous measurement of some sensors
+
+
+# System Services
+
+Automatically start `sensor_monitor.py` and `server.py` at boot or when the processes crash
+
+The files `sensor_monitor.service` and `sensor_server.service` must be copied to `/etc/systemd/system`
+ 
+Enable the services (services start during boot)
+
+- `systemctl enable sensor_monitor`
+- `systemctl enable sensor_server`
+
+Start the services
+- `systemctl start sensor_monitor`
+- `systemctl start sensor_server`
+
+Stop the services
+- `systemctl stop sensor_monitor`
+- `systemctl stop sensor_server`
+

@@ -1,0 +1,15 @@
+[Unit]
+Description=Sensor Monitor Server
+After=sensor_monitor.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/fhlthermorasp
+ExecStart=/usr/bin/nohup /usr/bin/python3 /opt/fhlthermorasp/server.py /opt/measurements/readings.txt 
+# Other Restart options: or always, on-abort, etc
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
