@@ -290,6 +290,13 @@ if __name__ == "__main__" :
 	parser.add_argument ( "--i2c-bus", type = int, default = 1, help = "I2C bus. Default: 1" )
 	args = parser.parse_args ( )
 
+	multiple_sensors = not (args.w1 ^ args.dht11 ^ args.sht21 ^ args.bme280 ^ args.sht75 ^ args.bme680 ^ args.dust )
+	
+	if multiple_sensors:
+		print('You enabled multiple sensors, which is not allowed')
+		print('Exiting!')
+		sys.exit()
+
 	sensors = list ( )
 	if args.w1 :
 		sensors.append ( ( "W1Temp", None ) )
@@ -305,7 +312,7 @@ if __name__ == "__main__" :
 		sensors.append ( ( "BME680", (args.i2c_bus,int(args.i2c_addr,16)) ) )
 	if args.dust :
 		sensors.append ( ( "DUST", None ) )
-
+		
 	if not args.dir is None :
 		readings_path = join ( args.dir, "readings.txt" )
 		readings_log_path = join ( args.dir, "readings_log.txt" )
