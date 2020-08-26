@@ -392,7 +392,7 @@ class myBME680(object):
 		self.sensor.set_gas_status(bme680.ENABLE_GAS_MEAS)
 
 	def read(self):
-		if bme680.BME680().get_sensor_data():
+		if self.sensor.get_sensor_data():
 			return BME680Result(self.get_sensor_name(), True, self.sensor.data.temperature, self.sensor.data.humidity, self.sensor.data.pressure)
 		
 	def get_sensor_type_name(self):
