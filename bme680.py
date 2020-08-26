@@ -384,7 +384,7 @@ class myBME680(object):
 		self.i2c_bus_number = i2c_bus_number
 		self.i2c_bus = smbus.SMBus(self.i2c_bus_number)
 
-		self.sensor = bme680.BME680()
+		self.sensor = bme680.BME680(i2c_addr=self.i2c_address,i2c_device=self.i2c_bus)
 		self.sensor.set_humidity_oversample(bme680.OS_2X)
 		self.sensor.set_pressure_oversample(bme680.OS_4X)
 		self.sensor.set_temperature_oversample(bme680.OS_8X)

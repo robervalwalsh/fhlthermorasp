@@ -51,6 +51,7 @@ class SensorMonitor ( object ) :
 				loaded_sensors.extend ( sensor_class.detect_sensors ( ) )
 			else :
 				loaded_sensors.append ( sensor_class ( *sensor_opts ) )
+		
 		return loaded_sensors
 
 	def add_sensor ( self, sensor ) :
@@ -285,6 +286,8 @@ if __name__ == "__main__" :
 	parser.add_argument ( "--sht75", action = "store_true", help = "Enable SHT75 sensors and try to auto-detect them." )
 	parser.add_argument ( "--bme680", action = "store_true", help = "Enable BME680 sensors and try to auto-detect them." )
 	parser.add_argument ( "--dust", action = "store_true", help = "Enable dust sensors and try to auto-detect them." )
+	parser.add_argument ( "--i2c-addr", type = str, default = '0x77', help = "I2C address. Default: '0x77'" )
+	parser.add_argument ( "--i2c-bus", type = int, default = 1, help = "I2C bus. Default: 1" )
 	args = parser.parse_args ( )
 
 	sensors = list ( )
@@ -299,7 +302,7 @@ if __name__ == "__main__" :
 	if args.sht75 :
 		sensors.append ( ( "SHT75", None ) )
 	if args.bme680 :
-		sensors.append ( ( "BME680", None ) )
+		sensors.append ( ( "BME680", (args.i2c_bus,int(args.i2c_addr,16)) ) )
 	if args.dust :
 		sensors.append ( ( "DUST", None ) )
 
@@ -314,6 +317,7 @@ if __name__ == "__main__" :
 		monitor = SensorMonitor ( sensors, readings_path, readings_log_path, options_path=args.config, alarm_number = args.num_alarm )
 	else :
 		monitor = SensorMonitor ( sensors, readings_path, readings_log_path, alarm_number = args.num_alarm )
+
 	if not args.alarm_temp is None :
 		monitor.set_alarm_limits ( "temp", args.alarm_temp[0], args.alarm_temp[1] )
 	if not args.alarm_hum is None :
