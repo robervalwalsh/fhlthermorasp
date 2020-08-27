@@ -48,9 +48,18 @@ class SensorMonitor ( object ) :
 		for sensor_name, sensor_opts in sensors :
 			sensor_class = self.KNOWN_SENSORS[sensor_name][0]
 			if sensor_opts is None :
-				loaded_sensors.extend ( sensor_class.detect_sensors ( ) )
+				try:
+					loaded_sensors.extend ( sensor_class.detect_sensors ( ) )
+				except:
+					print(f'\033[93mWarning: The sensor {sensor_name} does not exist!\033[0m')
 			else :
-				loaded_sensors.append ( sensor_class ( *sensor_opts ) )
+				try:
+					loaded_sensors.append ( sensor_class ( *sensor_opts ) )
+				except:
+					print(f'\033[93mWarning: The sensor {sensor_name}_i2c-{sensor_opts[0]}_{hex(sensor_opts[1])} does not exist!\033[0m')
+		if len(loaded_sensors) == 0:
+			print('\033[91mError: No sensor available!\033[0m')
+			sys.exit()
 		
 		return loaded_sensors
 
