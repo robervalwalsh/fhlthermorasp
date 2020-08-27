@@ -48,9 +48,19 @@ class SensorMonitor ( object ) :
 		for sensor_name, sensor_opts in sensors :
 			sensor_class = self.KNOWN_SENSORS[sensor_name][0]
 			if sensor_opts is None :
-				loaded_sensors.extend ( sensor_class.detect_sensors ( ) )
+				try:
+					loaded_sensors.extend ( sensor_class.detect_sensors ( ) )
+				except:
+					print(f'\033[93mWarning: The sensor {sensor_name} does not exist!\033[0m')
 			else :
-				loaded_sensors.append ( sensor_class ( *sensor_opts ) )
+				try:
+					loaded_sensors.append ( sensor_class ( *sensor_opts ) )
+				except:
+					print(f'\033[93mWarning: The sensor {sensor_name}_i2c-{sensor_opts[0]}_{hex(sensor_opts[1])} does not exist!\033[0m')
+		if len(loaded_sensors) == 0:
+			print('\033[91mError: No sensor available!\033[0m')
+			sys.exit()
+		
 		return loaded_sensors
 
 	def add_sensor ( self, sensor ) :
@@ -285,7 +295,16 @@ if __name__ == "__main__" :
 	parser.add_argument ( "--sht75", action = "store_true", help = "Enable SHT75 sensors and try to auto-detect them." )
 	parser.add_argument ( "--bme680", action = "store_true", help = "Enable BME680 sensors and try to auto-detect them." )
 	parser.add_argument ( "--dust", action = "store_true", help = "Enable dust sensors and try to auto-detect them." )
+	parser.add_argument ( "--i2c-addr", type = str, default = '0x77', help = "I2C address. Default: '0x77'" )
+	parser.add_argument ( "--i2c-bus", type = int, default = 1, help = "I2C bus. Default: 1" )
 	args = parser.parse_args ( )
+
+	multiple_sensors = not (args.w1 ^ args.dht11 ^ args.sht21 ^ args.bme280 ^ args.sht75 ^ args.bme680 ^ args.dust )
+	
+	if multiple_sensors:
+		print('You enabled multiple sensors, which is not allowed')
+		print('Exiting!')
+		sys.exit()
 
 	sensors = list ( )
 	if args.w1 :
@@ -299,21 +318,24 @@ if __name__ == "__main__" :
 	if args.sht75 :
 		sensors.append ( ( "SHT75", None ) )
 	if args.bme680 :
-		sensors.append ( ( "BME680", None ) )
+		sensors.append ( ( "BME680", (args.i2c_bus,int(args.i2c_addr,16)) ) )
 	if args.dust :
 		sensors.append ( ( "DUST", None ) )
-
+		
 	if not args.dir is None :
 		readings_path = join ( args.dir, "readings.txt" )
 		readings_log_path = join ( args.dir, "readings_log.txt" )
 	else :
-		readings_path = None
-		readings_log_path = None
+		default_path = "/opt/measurements"
+		sensor_name = sensors[0][0]+'_i2c-'+str(args.i2c_bus)+'_'+args.i2c_addr
+		readings_path = join ( default_path, sensor_name+"_readings.txt" )
+		readings_log_path = join ( default_path, sensor_name+"_readings_log.txt" )
 
 	if not args.config is None :
 		monitor = SensorMonitor ( sensors, readings_path, readings_log_path, options_path=args.config, alarm_number = args.num_alarm )
 	else :
 		monitor = SensorMonitor ( sensors, readings_path, readings_log_path, alarm_number = args.num_alarm )
+
 	if not args.alarm_temp is None :
 		monitor.set_alarm_limits ( "temp", args.alarm_temp[0], args.alarm_temp[1] )
 	if not args.alarm_hum is None :
