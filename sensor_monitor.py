@@ -317,8 +317,10 @@ if __name__ == "__main__" :
 		readings_path = join ( args.dir, "readings.txt" )
 		readings_log_path = join ( args.dir, "readings_log.txt" )
 	else :
-		readings_path = None
-		readings_log_path = None
+		default_path = "/opt/measurements"
+		sensor_name = sensors[0][0]+'_i2c-'+str(args.i2c_bus)+'_'+args.i2c_addr
+		readings_path = join ( default_path, sensor_name+"_readings.txt" )
+		readings_log_path = join ( default_path, sensor_name+"_readings_log.txt" )
 
 	if not args.config is None :
 		monitor = SensorMonitor ( sensors, readings_path, readings_log_path, options_path=args.config, alarm_number = args.num_alarm )
