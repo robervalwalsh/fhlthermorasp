@@ -15,10 +15,12 @@ def signal_handler(signum, frame):
 #Handle stop process siginal
 signal.signal(signal.SIGINT, signal_handler)
 
-if len(argv) < 2:
-	exit("Please input a file path.")
+if len(argv) < 3:
+	exit("Please input a file path and a port number.")
 if not isfile(argv[1]):
 	exit("Not a file: %s" % argv[1])
+
+PORT = int(argv[2])
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -27,7 +29,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.listen(10)
 	while not finish:
 		conn, addr = s.accept()
-		print("Got connection from %s:%i" % addr)
+		#print("Got connection from %s:%i" % addr)
 		with conn:
 			try:
 				f = open(argv[1], "rb")
