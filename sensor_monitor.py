@@ -56,6 +56,12 @@ class SensorMonitor ( object ) :
 				try:
 					loaded_sensors.append ( sensor_class ( *sensor_opts ) )
 				except:
+					if sensor_name == 'BME680':
+						add = 'a'
+						if hex(sensor_opts[1])=='0x77':
+							add='b'
+						ctl_name = f'sensor_monitor_{sensor_opts[0]:02d}{add}'
+						os.system(f'sudo systemctl stop {ctl_name}')
 					print(f'\033[93mWarning: The sensor {sensor_name}_i2c-{sensor_opts[0]}_{hex(sensor_opts[1])} does not exist!\033[0m')
 		if len(loaded_sensors) == 0:
 			print('\033[91mError: No sensor available!\033[0m')
